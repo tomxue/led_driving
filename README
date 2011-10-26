@@ -1,0 +1,17 @@
+Q: How to call C function by Qt?
+
+Method 1: 
+(1) Modify the .pro file by adding C source file and header file to the corresponding VARIABLES
+(2) Modify the C header file as below: tested already, important!
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+int gpio(int status, int ongoing);
+#ifdef __cplusplus
+}
+#endif
+
+(3) Include the header file in both the C source code and the Qt source code
+
+Method 2:
