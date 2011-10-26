@@ -1,7 +1,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int gpio(int duty_value);
+int gpio(int status, int ongoing);
 #ifdef __cplusplus
 }
 #endif

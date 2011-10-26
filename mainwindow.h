@@ -2,10 +2,29 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QThread>
+#include <QString>
 
 namespace Ui {
     class MainWindow;
 }
+
+class myThread : public QThread
+{
+  Q_OBJECT
+
+public:
+    myThread(QObject *parent = 0);
+    void run();
+    int duty_value;
+
+public slots:
+    void TimerUpdate();
+
+signals:
+    void deviceAmbient();
+
+};
 
 class MainWindow : public QMainWindow
 {
@@ -16,11 +35,13 @@ public:
     ~MainWindow();
 
 public slots:
-    int setValue(int);
+    void SliderChanged();
+    void SetSlider();
+    void CloseApp();
 
 private:
     Ui::MainWindow *ui;
-    void timerUpDate();
+    myThread *onethread;
 };
 
 

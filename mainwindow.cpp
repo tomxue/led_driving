@@ -3,35 +3,80 @@
 #include <QtCore>
 #include "gpio.h"
 
+#define high 1
+#define low  0
+#define ongoing 1
+#define stop 0
+
+/* ****** Thread part ****** */
+myThread::myThread(QObject *parent)
+    : QThread(parent)
+{
+}
+
+void myThread::run()
+{
+    QTimer timer;
+    connect(&timer, SIGNAL(timeout()), this, SLOT(TimerUpdate()));
+    timer.start(100); //update of each 100ms
+    exec();
+}
+
+void myThread::TimerUpdate()
+{
+    int i,j;
+    if( (duty_value<100)&&(duty_value>0) ) 
+    {
+      i = duty_value;
+      j = 100 - duty_value;
+    }
+    else
+    {
+      i = 50;
+      j = 50;
+    } 
+    emit deviceAmbient();
+
+    gpio(high, ongoing);
+    usleep(800*i);
+
+    gpio(low, ongoing);
+    usleep(800*j);
+
+    gpio(low, stop);
+}
+/* ****** Thread part ****** */
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(timerUpDate()));
-    timer->start(20); //20ms one time
+    ui->lineEdit->setText("NaN"); 
+    ui->horizontalSlider->setValue(50);
+    ui->horizontalSlider->show();
+    
+    onethread = new myThread(this);
+    onethread->duty_value = 50;
+    connect(onethread, SIGNAL(deviceAmbient()),
+            this, SLOT(SliderChanged()));
+    onethread->start(QThread::NormalPriority);
 }
 
-void MainWindow::timerUpDate()
+void MainWindow::SliderChanged()
 {
-    connect(ui->horizontalSlider, SIGNAL(valueChanged(int)),
-                 this, SLOT(setValue(int)));
+    connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)),
+                 this, SLOT(SetSlider()));
 }
 
-int MainWindow::setValue(int duty_value)
+void MainWindow::SetSlider()
 {
-//	typedef void (* my_func_t) (void *addr);
-	 
-//	QLibrary lib("libsum.so");
-//	my_func_t func = (my_func_t)lib.resolve("sum2"); // 
-//	if (!func) {
-//		  return -2;
-//	}
-//	func(8,6);	
-  // gpio(duty_value);
-  // sleep(1);
-  return gpio(30);
-  //printf("hello");
+    onethread->duty_value = ui->horizontalSlider->value();
+}
+
+void MainWindow::CloseApp()
+{
+    connect(ui->pushButton, SIGNAL(clicked()),
+                 this, SLOT(close()));
 }
 
 MainWindow::~MainWindow()

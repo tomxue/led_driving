@@ -53,10 +53,12 @@
 #define M7      7
 
 void *map_base;
-int n,fd,k,i,num_duty,j;
+int n,fd,k,i,j;
 unsigned int padconf;
 
-gpio(int duty_value)
+j = 0;
+
+int gpio(int status, int ongoing)
 {
     if((fd=open("/dev/mem",O_RDWR | O_SYNC))==-1){
         perror("open error!\n");
@@ -100,23 +102,29 @@ gpio(int duty_value)
     printf("GPIO5_DATAOUT_OFFSET - The register value is set to: 0x%x = 0d%u\n", padconf,padconf);
 
     //Hello world!
-        num_duty = duty_value;
-        if( (num_duty >= 1000) || (num_duty <= 0) )
-                num_duty = 500;
-    while(1)
+//      while(ongoing>0)
         {
-        j = j+1;
-        if(j%2 == 1)
-                usleep(20*num_duty);
-        else
-                usleep(20*(1000-num_duty));
-
-        padconf ^=  GPIO138;  // Toggle GPIO_138
-        INT(map_base+GPIO5_DATAOUT_OFFSET) = padconf;
-        padconf ^=  GPIO139;  // Toggle GPIO_139
-        INT(map_base+GPIO5_DATAOUT_OFFSET) = padconf;
+//	    j = j + 1;
+//	    if(j>2) break;
+	    usleep(10);
+            if(status == 1){
+                padconf |=  GPIO138;  // Toggle GPIO_138
+                INT(map_base+GPIO5_DATAOUT_OFFSET) = padconf;
+                padconf |=  GPIO139;  // Toggle GPIO_139
+                INT(map_base+GPIO5_DATAOUT_OFFSET) = padconf;
+	//	printf("set high\n");
+            }
+            else{
+                padconf &= ~GPIO138;  // Toggle GPIO_138
+                INT(map_base+GPIO5_DATAOUT_OFFSET) = padconf;
+                padconf &= ~GPIO139;  // Toggle GPIO_139
+                INT(map_base+GPIO5_DATAOUT_OFFSET) = padconf;
+	//	printf("set low\n");
+            }
+	  //  printf("while loop executing\n");
         }
 
     close(fd);
     munmap(map_base,0x40);
+ //   printf("closed and unmapped\n");
 }
