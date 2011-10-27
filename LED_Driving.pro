@@ -11,10 +11,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp gpio.c\
+        mainwindow.cpp
     
-
-HEADERS  += mainwindow.h gpio.h\
+LIBS += -L. -lsum -lgpio
+	
+HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 

@@ -1,7 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QtCore>
+
+extern "C" {
 #include "gpio.h"
+#include "sum.h"
+}
 
 #define high 1
 #define low  0
@@ -36,7 +40,9 @@ void myThread::TimerUpdate()
       j = 50;
     } 
     emit deviceAmbient();
-
+    sum2(2,3);
+    gpio(1,1);
+/*
     gpio(high, ongoing);
     usleep(800*i);
 
@@ -44,6 +50,7 @@ void myThread::TimerUpdate()
     usleep(800*j);
 
     gpio(low, stop);
+*/
 }
 /* ****** Thread part ****** */
 

@@ -53,10 +53,10 @@
 #define M7      7
 
 void *map_base;
-int n,fd,k,i,j;
+int n,fd,k,i;
 unsigned int padconf;
 
-j = 0;
+int j = 0;
 
 int gpio(int status, int ongoing)
 {
