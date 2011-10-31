@@ -13,7 +13,7 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp
     
-LIBS += -L. -lsum -lgpio
+LIBS += -L. -lpwm_test
 	
 HEADERS  += mainwindow.h
 

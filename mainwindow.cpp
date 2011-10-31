@@ -3,9 +3,9 @@
 #include <QtCore>
 
 extern "C" {
-#include "gpio.h"
-#include "sum.h"
+#include "pwm_test.h"
 }
+
 
 #define high 1
 #define low  0
@@ -22,35 +22,16 @@ void myThread::run()
 {
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(TimerUpdate()));
-    timer.start(100); //update of each 100ms
+    timer.start(200); //update of each 200ms
     exec();
 }
 
 void myThread::TimerUpdate()
 {
-    int i,j;
-    if( (duty_value<100)&&(duty_value>0) ) 
-    {
-      i = duty_value;
-      j = 100 - duty_value;
-    }
-    else
-    {
-      i = 50;
-      j = 50;
-    } 
+
     emit deviceAmbient();
-    sum2(2,3);
-    gpio(1,1);
-/*
-    gpio(high, ongoing);
-    usleep(800*i);
+    pwm_test(duty_value/10.0);
 
-    gpio(low, ongoing);
-    usleep(800*j);
-
-    gpio(low, stop);
-*/
 }
 /* ****** Thread part ****** */
 
@@ -59,20 +40,34 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 {
     ui->setupUi(this);
     ui->lineEdit->setText("NaN"); 
-    ui->horizontalSlider->setValue(50);
+    ui->horizontalSlider->setValue(500);
     ui->horizontalSlider->show();
     
     onethread = new myThread(this);
-    onethread->duty_value = 50;
+    onethread->duty_value = 500;
     connect(onethread, SIGNAL(deviceAmbient()),
             this, SLOT(SliderChanged()));
+    connect(onethread, SIGNAL(deviceAmbient()),
+            this, SLOT(EditContentChange()));
     onethread->start(QThread::NormalPriority);
+    connect(ui->pushButton, SIGNAL(clicked()),
+            this, SLOT(CloseApp()));
 }
 
 void MainWindow::SliderChanged()
 {
     connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)),
                  this, SLOT(SetSlider()));
+}
+
+void MainWindow::EditContentChange()
+{
+    float duty;
+    QString s;
+    duty = onethread->duty_value/10.0;
+    s.sprintf("%.2f", duty);
+    ui->lineEdit->setText(s);
+ // ui->lineEdit->setText("the duty cycle");
 }
 
 void MainWindow::SetSlider()
@@ -82,8 +77,7 @@ void MainWindow::SetSlider()
 
 void MainWindow::CloseApp()
 {
-    connect(ui->pushButton, SIGNAL(clicked()),
-                 this, SLOT(close()));
+    close();
 }
 
 MainWindow::~MainWindow()

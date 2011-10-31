@@ -16,7 +16,7 @@ class myThread : public QThread
 public:
     myThread(QObject *parent = 0);
     void run();
-    int duty_value;
+    float duty_value;
 
 public slots:
     void TimerUpdate();
@@ -36,6 +36,7 @@ public:
 
 public slots:
     void SliderChanged();
+    void EditContentChange();
     void SetSlider();
     void CloseApp();
 

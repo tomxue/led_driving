@@ -7,7 +7,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    //qDebug() << sum2(8,7);
 #if defined(Q_WS_S60)
     w.showMaximized();
 #else
